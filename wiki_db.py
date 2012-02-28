@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import wiki_api as wapi
+import wiki_update as wup
 
 # create tables if any is missing, if drop is True, then drop all tables
 def init_db( path, drop=False ):
@@ -40,30 +40,29 @@ def init_db( path, drop=False ):
     cursor.execute( create_last_revisions_query )
     
 
+def is_search_data_cached( db, query, lang ):
+    return is_query_cached( db, query, lang, table='search_map' )
+
+def is_query_cached( db, query, lang, table='id_map' ):
+    id = get_query_id( db, query, lang, table )
+    return id is not None
+    
 def get_query_hits( db, query, lang ):
+    if not is_search_data_cached( db, query, lang ):
+        wup.update_query_hits( db, query, lang )
+
     query_id = get_query_id( db, query, lang, table='search_map' )
     db_query = '''select title from search_data
                   where query_id = ?'''
     results = db.execute( db_query, (query_id,) ).fetchall()
-    return results if results is None else [t[0] for t in results]
 
-def update_query_hits( db, query, lang ):
-    query_id = get_or_create_query_id( db, query, lang, table='search_map' )
-
-    propositions = wapi.search_propositions( query, lang )
-    insert_query = '''insert into search_data
-                      values (?,?)'''
-    for proposition in propositions:
-        db.execute( insert_query, (query_id, proposition) )
-
-def is_search_data_cached( db, query, lang ):
-    return is_query_cached( db, query, lang, table='search_map' )
+    return [t[0] for t in results]
 
 def get_data( db, query, lang, year=None, month=None ):
-    if is_query_cached( db, query, lang ):
-        return get_cached_data( db, query, lang, year, month )
-    else:
-        return get_fresh_data( db, query, lang, year, month )
+    if not is_query_cached( db, query, lang ):
+       wup.update_data( db, query, lang )
+
+    return get_cached_data( db, query, lang, year, month )
 
 def get_cached_data( db, query, lang, year=None, month=None ):
     query_id = get_query_id( db, query, lang )
@@ -72,19 +71,6 @@ def get_cached_data( db, query, lang, year=None, month=None ):
         'editions': get_editions( db, query_id, year, month )
     }
     
-def get_fresh_data( db, query, lang, year=None, month=None ):
-    fresh_data = wapi.grab_data( lang, query )
-    update_full_data( db, query, lang, fresh_data )
-    
-    return get_cached_data( db, query, lang, year, month )
-    
-def update_full_data( db, query, lang, data ):
-    user_data = {}
-    query_id = get_or_create_query_id( db, query, lang )
-    update_editions( db, query_id, data['results'] )
-    update_last_revision( db, query_id )
-
-    
 def get_query_id( db, query, lang, table='id_map' ):
     db_query = '''select query_id from ''' + table + ''' 
                   where query=? and lang=?'''
@@ -92,62 +78,6 @@ def get_query_id( db, query, lang, table='id_map' ):
     
     return query_id if query_id is None else query_id[0]
     
-def get_or_create_query_id( db, query, lang, table='id_map' ):
-    query_id = get_query_id( db, query, lang, table )
-    if query_id is None:
-        new_query_id = get_max_query_id( db, table ) + 1
-        db_query = '''insert into ''' + table + ''' 
-                      values (?,?,?)'''
-        db.execute( db_query, (query, lang, new_query_id) )
-        return new_query_id
-    else:
-        return query_id
-        
-def get_max_query_id( db, table='id_map' ):
-    min_id = 0
-    db_query = '''select query_id from ''' + table
-    ids = db.execute( db_query, () ).fetchall()
-
-    last_max_id = min_id
-    for t in ids:
-        last_max_id = max( last_max_id, t[0] )
-    return last_max_id
-    
-def update_editions( db, query_id, editions ):
-    # remove old values
-    del_query = '''delete from editions
-                   where query_id=?'''
-    db.execute( del_query, (query_id,) )
-    
-    # insert new values
-    insert_query = '''insert into editions
-                      values (?,?,?,?,?,?)'''
-    # TODO, TODO!!
-    for edition, count in editions.iteritems():
-        year_str, month_str = edition.split('-')
-        year = int( year_str )
-        month = int( month_str )
-        import random, string
-        for i in range( count ):
-            day = random.choice(range(30)) + 1
-            author=''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(6)) 
-            time = year_str + ":" + month_str + ":" + str(day)
-            db.execute( insert_query, (query_id, year, month, day, time, author) )
-    
-def update_last_revision( db, query_id ):
-    update_query = '''update last_revisions
-                      set last_revision=?
-                      where query_id=?'''
-    last_revision = 1
-    db.execute( update_query, (last_revision, query_id) )
-    
-
-def get_last_revision( db, query_id ):
-    db_query = '''select last_revision from last_revisions
-                  where query_id=?'''
-    last_revision = db.execute( db_query, (query_id,) ).fetchone()
-    return last_revision if last_revision is None else last_revision[0]
-
 def get_editions( db, query_id, year=None, month=None ):
     editions = []
     if month is not None:
@@ -183,7 +113,3 @@ def get_all_time_editions( db, query_id ):
     results = db.execute( db_query, (query_id,) ).fetchall()
     return map( lambda t: { 'year': t[0], 'count': t[1] }, results )
         
-def is_query_cached( db, query, lang, table='id_map' ):
-    id = get_query_id( db, query, lang, table )
-    return id is not None
-    

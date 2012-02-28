@@ -22,8 +22,6 @@ def propositions( db ):
     query = request.query.query
     lang = request.query.lang
     
-    if not wdb.is_search_data_cached( db, query, lang):
-        wdb.update_query_hits( db, query, lang )
     propositions = wdb.get_query_hits( db, query, lang )
 
     return {

@@ -11,9 +11,10 @@ def update_query_hits( db, query, lang ):
     for proposition in propositions:
         db.execute( insert_query, (query_id, proposition) )
 
-def update_full_data( db, query, lang, data ):
-    user_data = {}
+def update_data( db, query, lang ):
+    data = wapi.grab_data( lang, query )
     query_id = get_or_create_query_id( db, query, lang )
+
     update_editions( db, query_id, data['results'] )
     update_last_revision( db, query_id )
 
