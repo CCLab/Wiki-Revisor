@@ -40,6 +40,26 @@ def data( db ):
         
     return { 'data': data }
 
+@route('/year')
+def year_data( db ):
+    query = request.query.query
+    lang = request.query.lang
+    year = request.query.year
+
+    data = wdb.get_year_data( db, query, lang, year )
+
+    return { 'data': data }
+
+@route('/month')
+def month_data( db ):
+    query = request.query.query
+    lang = request.query.lang
+    year = request.query.year
+
+    data = wdb.get_month_data( db, query, lang, year, month )
+
+    return { 'data': data }
+
 
 # static files
 from bottle import static_file
