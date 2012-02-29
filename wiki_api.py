@@ -69,7 +69,8 @@ def grab_data( lang, query, startid=None ):
         # f.write( rev_res )
         # f.close()
 
-    revisions_list = []
+    revisions_list   = []
+    last_id = None
     while True:
         for page_id in revision_results['query']['pages']:
             for revision in revision_results['query']['pages'][page_id]['revisions']:
@@ -78,6 +79,8 @@ def grab_data( lang, query, startid=None ):
                 y, m, d = date.split('-')
 
                 revisions_list.append( ( int(y), int(m), int(d), time, user ) )
+
+                last_id = revision['revid']
 
         if 'query-continue' not in revision_results:
             break
@@ -94,9 +97,14 @@ def grab_data( lang, query, startid=None ):
         # serialize it as a python dictionary
         revision_results = js.loads( json_data )
 
+    final_data = {
+        'last_id': last_id,
+        'results': revisions_list[1:] if startid else revisions_list
+    }
+
     if DATA_DEBUG:
         print ">>> FINAL RESULTS"
-        print revisions_list
+        print final_data
 
-    return revisions_list[1:] if startid else revisions_list
+    return final_data
 
