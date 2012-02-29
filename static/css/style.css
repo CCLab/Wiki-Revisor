@@ -1,1 +1,7 @@
-/* TODO */
+body {
+  width: 800px;
+  margin: 10px auto;
+  background-color: #5a5a5a;
+  font-family: 'Exo', sans-serif;  
+  color: #e1e1e1;
+}

@@ -1,76 +1,77 @@
 _app = (function (){
     var that = {};
-    
+
     that.init = function() {
         $('#input-phrase').hide();
         $('#select-phrase').hide();
         $('#diagram-results').hide();
+        $('#paper').hide();
         arm_buttons();
     };
-    
+
     function arm_buttons() {
         $('#select-mode-button').click( function() {
             var mode = $('#select-mode').find('input:checked').val();
-            
+
             state.set_mode( parseInt( mode, 10 ) );
-            
+
             $('#input-phrase').show();
             $('#phrase-field').val('');
             $('#select-mode').hide();
         });
-        
+
         $('#input-phrase-button').click( function() {
             $('#input-phrase').submit();
         });
-        
+
         $('#input-phrase').submit( function() {
             var phrase = $(this).find('#phrase-field').val();
             var lang = $(this).find('#lang-field').val();
             state.add_lang( lang );
-            
+
             _store.get_propositions( phrase, lang, show_propositions );
-            
+
             return false;
         });
-        
+
         $('#select-phrase-button').click( function() {
             $('#select-phrase').submit();
         });
-        
+
         $('#select-phrase').submit( function() {
             var query = $(this).find('input:checked').val();
             var lang = state.get_lang( state.act_nr() );
-            
+
             state.add_query( query );
-            
+
             get_data( query, lang, try_draw_diagram );
-            
+
             if ( state.get_mode() > state.act_nr() ) {
                 $('#input-phrase').show();
                 $('#select-phrase').hide();
             }
-            
+
             return false;
         });
     }
-    
+
     function show_propositions( data ) {
         var propositions = data['propositions'];
         // TODO: cached button changes after choosing cached propositions
         var is_cached = data['cached'];
-        
+
         $('#phrase-propositions').children().remove();
         $('#phrase-propositions').html('');
-        
+
         propositions.forEach( function ( phrase, i ) {
             var proposition = proposition_to_html( phrase, i + 1 );
             $('#phrase-propositions').append( proposition );
         });
-        
+
         $('#select-phrase').show();
         $('#input-phrase').hide();
     }
-    
+
     function proposition_to_html( name, nr ) {
         if ( nr === 1 ) {
             return '<input type="radio" name="propositions" value="' + name + '" checked>' + name + '<br>';
@@ -78,43 +79,45 @@ _app = (function (){
             return '<input type="radio" name="propositions" value="' + name + '">' + name + '<br>';
         }
     }
-    
+
     function get_data( query, lang, callback ) {
         function response( received_data ) {
             state.add_data( received_data );
             callback();
         }
-        
+
         var fresh_data = $('#fresh-button').is(':checked');
-        
+
         if ( fresh_data ) {
             _store.get_fresh_data( query, lang, response );
         } else {
             _store.get_cached_data( query, lang, response );
         }
     }
-    
+
     function try_draw_diagram() {
         var full_data = state.get_data();
         var image_width = 600;
         var image_height = 400;
         var merged_data = [];
         var mode = state.get_mode();
-        
+
         // if not all data is downloaded
         if ( full_data.length < mode ) {
             return;
         }
-        
+
         $('#select-phrase').hide();
         $('#diagram-results').show();
-        
+
         merged_data = merge_data( full_data );
-        
-        _diagram.draw( merged_data, mode, image_width, image_height );
+
+        //_diagram.draw( merged_data, mode, image_width, image_height );
+        $('#paper').show();
+        _graph.draw_graph( full_data[0]['editions'], state.get_query( 0 ) );
     }
-    
-    function merge_data( full_data ) {        
+
+    function merge_data( full_data ) {
         function cmp_dates( date1, date2 ) {
             function date_to_value( date ) {
                 return 12 * date['year'] + date['month'];
@@ -146,10 +149,10 @@ _app = (function (){
                 key = 'changes' + i;
                 obj[ key ] = 0;
             }
-            
+
             return obj;
         }
-        
+
         var min_date = full_data.map( function ( data ) {
             return data['editions'][0];
         }).sort( cmp_dates )[0];
@@ -157,15 +160,14 @@ _app = (function (){
             return data['editions'][ data['editions'].length - 1 ];
         }).sort( cmp_dates );
         var max_date = max_dates[ max_dates.length - 1 ];
-        
+
         var act_date = min_date;
         var merged_data = [];
         while ( cmp_dates( act_date, max_date ) <= 0 ) {
-            console.log('x');
             merged_data.push( create_clean_object( act_date, full_data.length ) );
             act_date = next_date( act_date );
         }
-        
+
         full_data.forEach( function ( data, i ) {
             var editions = data['editions'];
             var key = 'changes' + (i+1);
@@ -177,17 +179,17 @@ _app = (function (){
                 }
             });
         });
-        
+
         // TODO: last changes are lost
         return merged_data;
     }
-    
+
     var state = (function() {
         var _langs = [];
         var _queries = [];
         var _mode;
         var _data = [];
-        
+
         return {
             reset: function() {
                 _langs = [];
@@ -223,6 +225,6 @@ _app = (function (){
             }
         };
     })();
-    
+
     return that;
 })();
