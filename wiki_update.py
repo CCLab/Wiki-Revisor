@@ -27,8 +27,6 @@ def update_search_data( db, query, lang ):
     for title in propositions:
         if title not in prev_results:
             db.execute( insert_query, (query_id,title) )
-    for proposition in propositions:
-        db.execute( insert_query, (query_id, proposition) )
 
 def update_data( db, query, lang ):
     query_id = get_or_create_query_id( db, query, lang )
