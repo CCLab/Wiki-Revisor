@@ -49,7 +49,7 @@ def is_query_cached( db, query, lang, table='id_map' ):
     
 def get_query_hits( db, query, lang ):
     if not is_search_data_cached( db, query, lang ):
-        wup.update_query_hits( db, query, lang )
+        wup.update_search_data( db, query, lang )
 
     query_id = get_query_id( db, query, lang, table='search_map' )
     db_query = '''select title from search_data
@@ -80,12 +80,15 @@ def get_query_id( db, query, lang, table='id_map' ):
     
 def get_editions( db, query_id, year=None, month=None ):
     editions = []
+    '''
     if month is not None:
         results = get_month_editions( db, query_id, year, month )
     elif year is not None:
         results = get_year_editions( db, query_id, year )
     else:
         results = get_all_time_editions( db, query_id )
+    '''
+    results = get_year_month_editions( db, query_id )
 
     return results
 
@@ -112,4 +115,12 @@ def get_all_time_editions( db, query_id ):
                   order by year'''
     results = db.execute( db_query, (query_id,) ).fetchall()
     return map( lambda t: { 'year': t[0], 'count': t[1] }, results )
+ 
+def get_year_month_editions( db, query_id ):
+    db_query = '''select year, month, count(*) from editions
+                  where query_id=?
+                  group by year, month
+                  order by year, month'''
+    results = db.execute( db_query, (query_id,) ).fetchall()
+    return map( lambda t: { 'year': t[0], 'month': t[1],'count': t[2] }, results )
         
