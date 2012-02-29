@@ -11,31 +11,45 @@ from bottle_sqlite import SQLitePlugin
 install( SQLitePlugin(dbfile=db_path) )
 
 
+# To generate html file
+template_dict = {
+    'mode_select': 'Wybierz',
+    'lang': 'pl',
+    'title': 'WikiSearch',
+    'mode1': 'Sprawdź hasło',
+    'mode2': 'Porównaj hasła',
+    'phrases_title': 'Dokładne hasła',
+    'phrase_select': 'Wybierz hasło',
+    'phrase': 'Hasło',
+    'language': 'Język',
+    'fresh_data': 'Aktualne dane',
+    'save': 'Zapisz'
+}
 # routing
 
 @route('/')
 def app():
     return template('app', template_dict)
-    
+
 @route('/propositions')
 def propositions( db ):
     query = request.query.query
     lang = request.query.lang
-    
+
     propositions = wdb.get_query_hits( db, query, lang )
 
     return {
         'propositions': propositions,
         'cached'      : False
     }
-    
+
 @route('/data')
 def data( db ):
     query = request.query.query
     lang = request.query.lang
-    
+
     data = wdb.get_data( db, query, lang )
-        
+
     return { 'data': data }
 
 @route('/year')
@@ -69,7 +83,7 @@ def server_static(filename):
 @route('/static/img/<filename>')
 def server_static(filename):
     return static_file(filename, root='static/img')
-    
+
 @route('/static/js/<filename>')
 def server_static(filename):
     return static_file(filename, root='static/js')
@@ -80,7 +94,7 @@ def server_static(filename):
 @route('/purge/')
 def purge_db():
     wdb.init_db( db_path, drop=True )
-    
+
 
 # create dbs if not exist
 wdb.init_db( db_path, drop=False )
@@ -88,17 +102,3 @@ wdb.init_db( db_path, drop=False )
 run(host='localhost', port=8080, debug=True, reloader=True)
 
 
-# To generate html file
-template_dict = {
-    'mode_select': 'Wybierz',
-    'lang': 'pl',
-    'title': 'WikiSearch',
-    'mode1': 'Sprawdź hasło',
-    'mode2': 'Porównaj hasła',
-    'phrases_title': 'Dokładne hasła',
-    'phrase_select': 'Wybierz hasło',
-    'phrase': 'Hasło',
-    'language': 'Język',
-    'fresh_data': 'Aktualne dane',
-    'save': 'Zapisz'
-}

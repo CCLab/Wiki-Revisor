@@ -3,7 +3,7 @@
 import urllib as ul
 import simplejson as js
 
-DATA_DEBUG = False
+DATA_DEBUG = True
 
 def search_propositions( query, lang ):
     host = 'http://'+lang+'.wikipedia.org/w/api.php'
@@ -36,19 +36,21 @@ def search_propositions( query, lang ):
         # f.write( se_res )
         # f.close()
 
-
     return [ hit['title'] for hit in search_results['query']['search'] ]
-    
 
-def grab_data( lang, hit ):
+
+def grab_data( lang, query, startid=None ):
     host = 'http://'+lang+'.wikipedia.org/w/api.php'
     data = {
         'action'  : 'query',
         'format'  : 'json',
-        'titles'  : hit.encode('utf-8'),
+        'titles'  : query.encode('utf-8'),
         'prop'    : 'revisions',
-        'rvlimit' : 100
+        'rvlimit' : 100,
+        'rvdir'   : 'newer'
     }
+    if startid:
+        data['rvstartid'] = startid
 
     # stringify data into GET params
     params = ul.urlencode( data )
@@ -67,12 +69,15 @@ def grab_data( lang, hit ):
         # f.write( rev_res )
         # f.close()
 
-    revision_dates = {}
+    revisions_list = []
     while True:
         for page_id in revision_results['query']['pages']:
             for revision in revision_results['query']['pages'][page_id]['revisions']:
-                d = revision['timestamp'].split('T')[0].rsplit('-',1)[0]
-                revision_dates[ d ] = revision_dates.get( d, 0 ) + 1
+                user       = revision['user']
+                date, time = revision['timestamp'].strip('Z').split('T')
+                y, m, d = date.split('-')
+
+                revisions_list.append( ( int(y), int(m), int(d), time, user ) )
 
         if 'query-continue' not in revision_results:
             break
@@ -89,5 +94,9 @@ def grab_data( lang, hit ):
         # serialize it as a python dictionary
         revision_results = js.loads( json_data )
 
-    return { 'query': hit, 'results': revision_dates }
-    
+    if DATA_DEBUG:
+        print ">>> FINAL RESULTS"
+        print revisions_list
+
+    return revisions_list[1:] if startid else revisions_list
+
