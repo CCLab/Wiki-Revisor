@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import wiki_api as wapi
+import time
 
 def update_search_data( db, query, lang ):
     query_id = get_or_create_query_id( db, query, lang, table='search_map' )
@@ -9,9 +10,11 @@ def update_search_data( db, query, lang ):
     prev_list = db.execute( db_query, (query_id,) ).fetchall()
     prev_results = {}
     for t in prev_list:
-        prev_results[ t ] = True
-
+        prev_results[ t[0] ] = True
+    start_time = time.time()
     propositions = wapi.search_propositions( query, lang )
+    print 'Search query =', query
+    print 'Search elapsed:', time.time() - start_time
     new_results = {}
     for t in propositions:
         new_results[ t ] = True
@@ -32,7 +35,10 @@ def update_data( db, query, lang ):
     query_id = get_or_create_query_id( db, query, lang )
     last_id = get_last_revision_id( db, query_id )
 
+    start_time = time.time()
     data = wapi.grab_data( lang, query, startid=last_id )
+    print 'Editions query =', query
+    print 'Editions elapsed:', time.time() - start_time
 
     update_editions( db, query_id, data['results'] )
     update_last_revision( db, query_id, data['last_id'] )
@@ -66,7 +72,6 @@ def get_max_query_id( db, table='id_map' ):
     return last_max_id
 
 def update_editions( db, query_id, editions ):
-    # insert new values
     insert_query = '''insert into editions
                       values (?,?,?,?,?,?)'''
     for t in editions:
@@ -85,8 +90,68 @@ def get_last_revision( db, query_id ):
     return None if last_revision is None else last_revision[0]
 
 def update_last_revision( db, query_id, last_revision ):
-    update_query = '''update last_revisions
-                      set last_revision=?
-                      where query_id=?'''
-    db.execute( update_query, (last_revision, query_id) )
+    del_query = '''delete from last_revisions
+                   where query_id=?'''
+    db.execute( del_query, (query_id,) )
+
+    ins_query = '''insert into last_revisions
+                   values (?,?)'''
+    db.execute( ins_query, (query_id, last_revision) )
+
+def update_all_search_queries( db ):
+    start_time = time.time()
+
+    db_query = '''select query, lang from search_map'''
+    results = db.execute( db_query, () ).fetchall()
+    for t in results:
+        query, lang = t
+        update_search_data( db, query, lang )
+
+    return {
+        'time' : time.time() - start_time,
+        'count': len( results )
+    }
+
+def update_all_editions( db ):
+    start_time = time.time()
+
+    db_query = '''select query, lang from id_map'''
+    results = db.execute( db_query, () ).fetchall()
+    for t in results:
+        query, lang = t
+        update_data( db, query, lang )
+
+    return {
+        'time' : time.time() - start_time,
+        'count': len( results )
+    }
+
+def cron_job( db ):
+    print 'CRON START'
+    cron_search_results = update_all_search_queries( db )
+    print '===================================='
+    cron_editions_results = update_all_editions( db )
+    print 'CRON END'
+    print '>>>>'
+    print 'Search update:'
+    print 'Queries:', cron_search_results['count']
+    print 'Time elapsed:', cron_search_results['time']
+    print 'Editions update:'
+    print 'Queries:', cron_editions_results['count']
+    print 'Time elapsed:', cron_editions_results['time']
+    print '>>>>'
+
+import sys, os, sqlite3
+
+if __name__ == "__main__":
+    try:
+        path = sys.argv[1]
+    except:
+        file_path = os.path.dirname( __file__ )
+        path = os.path.join( file_path, 'tmp', 'test.db' )
+
+    conn = sqlite3.connect( path )
+    cursor = conn.cursor()
+
+    cron_job( cursor )
 

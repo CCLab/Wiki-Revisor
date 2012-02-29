@@ -3,7 +3,7 @@
 import urllib as ul
 import simplejson as js
 
-DATA_DEBUG = True
+DATA_DEBUG = False
 
 def search_propositions( query, lang ):
     host = 'http://'+lang+'.wikipedia.org/w/api.php'
@@ -74,7 +74,7 @@ def grab_data( lang, query, startid=None ):
     while True:
         for page_id in revision_results['query']['pages']:
             for revision in revision_results['query']['pages'][page_id]['revisions']:
-                user       = revision['user']
+                user       = revision.get( 'user', '' )
                 date, time = revision['timestamp'].strip('Z').split('T')
                 y, m, d = date.split('-')
 

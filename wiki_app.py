@@ -36,7 +36,8 @@ def propositions( db ):
     query = request.query.query
     lang = request.query.lang
 
-    propositions = wdb.get_query_hits( db, query, lang )
+    lower_query = query.lower()
+    propositions = wdb.get_query_hits( db, lower_query, lang )
 
     return {
         'propositions': propositions,
@@ -48,7 +49,8 @@ def data( db ):
     query = request.query.query
     lang = request.query.lang
 
-    data = wdb.get_data( db, query, lang )
+    lower_query = query.lower()
+    data = wdb.get_data( db, lower_query, lang )
 
     return { 'data': data }
 
