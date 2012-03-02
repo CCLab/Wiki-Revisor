@@ -2,14 +2,43 @@ _app = (function (){
     var that = {};
 
     that.init = function() {
-        $('#input-phrase').hide();
-        $('#select-phrase').hide();
-        $('#diagram-results').hide();
-        $('#paper').hide();
-        arm_buttons();
+        $('#results').hide();
+
+        $('#query-button').click( function () {
+            $('#query-form').submit();
+        });
+
+        $('#query-form').submit( function () {
+            show_preloader('query');
+
+            var query = $('#query-field').val();
+            var lang  = $('#lang-field').val();
+            state.add_lang( lang );
+
+            _store.get_propositions( query, lang, show_propositions );
+
+            return false;
+        });
     };
 
+    function show_preloader( key ) {
+        var mgs = {
+            'query': 'Wczytuję dane z Wikipedii. To może chwilę potrwać'
+        };
+
+        console.log( mgs[key] );
+    }
+
     function arm_buttons() {
+        $('.single').click( function () {
+            state.set_mode( 1 );
+
+            $('#input-phrase').show();
+            $('#phrase-field').val('');
+            $('#select-mode').hide();
+        });
+
+
         $('#select-mode-button').click( function() {
             var mode = $('#select-mode').find('input:checked').val();
 
@@ -51,6 +80,7 @@ _app = (function (){
                 $('#select-phrase').hide();
             }
 
+
             return false;
         });
     }
@@ -60,16 +90,14 @@ _app = (function (){
         // TODO: cached button changes after choosing cached propositions
         var is_cached = data['cached'];
 
-        $('#phrase-propositions').children().remove();
-        $('#phrase-propositions').html('');
+        $('#results-propositions').empty();
 
         propositions.forEach( function ( phrase, i ) {
             var proposition = proposition_to_html( phrase, i + 1 );
-            $('#phrase-propositions').append( proposition );
+            $('#results-propositions').append( proposition );
         });
 
-        $('#select-phrase').show();
-        $('#input-phrase').hide();
+        $('#results').fadeIn( 250 );
     }
 
     function proposition_to_html( name, nr ) {

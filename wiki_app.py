@@ -14,6 +14,8 @@ install( SQLitePlugin(dbfile=db_path) )
 # To generate html file
 template_dict = {
     'mode_select': 'Wybierz',
+    'query_button': 'Szukaj',
+    'select_button': 'Wybierz',
     'lang': 'pl',
     'title': 'WikiSearch',
     'mode1': 'Sprawdź hasło',
@@ -28,16 +30,20 @@ template_dict = {
 # routing
 
 @route('/')
-def app():
-    return template('app', template_dict)
+def index():
+    return template( 'index', template_dict )
+
+@route('/single')
+def single_query():
+    return template( 'single_query', template_dict )
 
 @route('/propositions')
 def propositions( db ):
     query = request.query.query
     lang = request.query.lang
 
-    lower_query = query.lower()
-    propositions = wdb.get_query_hits( db, lower_query, lang )
+    #lower_query = query.lower()
+    propositions = wdb.get_query_hits( db, query, lang )
 
     return {
         'propositions': propositions,
@@ -49,8 +55,8 @@ def data( db ):
     query = request.query.query
     lang = request.query.lang
 
-    lower_query = query.lower()
-    data = wdb.get_data( db, lower_query, lang )
+    #lower_query = query.lower()
+    data = wdb.get_data( db, query, lang )
 
     return { 'data': data }
 
