@@ -14,14 +14,21 @@ def search_propositions( query, lang ):
         'srsearch' : query.encode('utf-8')
     })
 
+    if DATA_DEBUG:
+        print ">>> %s" % data
+
     # read stringified json result
     search_results = ul.urlopen( host, data ).read()
     # serialize it as python dictionary
     search_results = js.loads( search_results )
+    if DATA_DEBUG:
+        print ">>> %s" % search_results
 
     # due to WikiMedia bug reported here:
     # https://bugzilla.wikimedia.org/show_bug.cgi?id=16572
     while 'error' in search_results.keys():
+        if DATA_DEBUG:
+            print ">>> Error ocured - I'm trying again!"
         # read stringified json result
         search_results = ul.urlopen( host, data ).read()
         # serialize it as python dictionary

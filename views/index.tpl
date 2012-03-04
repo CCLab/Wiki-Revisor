@@ -16,17 +16,17 @@
   <br />
 
   <section style="width: 48%;" class="left">
-    <h1><a href="/single">Pojedyncze hasło</a></h1>
-    <a href="/single"><img src="/static/img/copyright.png" alt="Historia edycji hasła Copyright na anglojęzycznej Wikipedii" class="left" /></a>
+    <h1><a href="/single_query">Pojedyncze hasło</a></h1>
+    <a href="/single_query"><img src="/static/img/copyright.png" alt="Historia edycji hasła Copyright na anglojęzycznej Wikipedii" class="left" /></a>
     <p class="right">Ten modół pozwoli zobaczyć szczegółowe statystyki pojedynczego hasła z Wikipedii.</p>
-    <div class="right button"><a href="/single">Stwórz statystykę</a></div>
+    <div class="right button"><a href="/single_query">Stwórz statystykę</a></div>
   </section>
 
   <section style="width: 48%;" class="right">
-    <h1><a href="/double">Zestawienie haseł</a></h1>
-    <a href="/double"><img src="/static/img/both.png" alt="Historia edycji hasła Copyright na anglojęzycznej Wikipedii" class="left" /></a>
+    <h1><a href="/double_query">Zestawienie haseł</a></h1>
+    <a href="/double_query"><img src="/static/img/both.png" alt="Historia edycji hasła Copyright na anglojęzycznej Wikipedii" class="left" /></a>
     <p class="right">Ten modół pozwoli zobaczyć szczegółowe statystyki pojedynczego hasła z Wikipedii.</p>
-    <div class="right button"><a href="/double">Stwórz zestawienie</a></div>
+    <div class="right button"><a href="/double_query">Stwórz zestawienie</a></div>
   </section>
 
   <br />

@@ -24,7 +24,7 @@ _app = (function (){
     function show_propositions( data ) {
         var propositions = data['propositions'];
         var results_prop = $('#results-propositions');
-        var lang  = state.get_lang( state.act_nr() );
+        var lang = $('#lang-field').val();
 
         // remove previously displayed results
         results_prop.empty();
@@ -32,7 +32,7 @@ _app = (function (){
         // add new results
         results_prop.append( propositions.map( function ( e ) {
             return '<li>' +
-                     '<a href="/data/'+ lang +'/'+ e +'">' +
+                     '<a href="/single_graph/'+ lang +'/'+ encodeURIComponent( e ) +'">' +
                        '<p class="button">' + e +'</p>' +
                      '</a>' +
                    '</li>';
@@ -42,86 +42,86 @@ _app = (function (){
         $('#results').fadeIn( 250 );
     }
 
-    function draw_diagram() {
-        var full_data = state.get_data();
-        var image_width = 600;
-        var image_height = 400;
-        var merged_data = [];
-        var mode = state.get_mode();
-
-        // if not all data is downloaded
-        if ( full_data.length < mode ) {
-            return;
-        }
-
-        $('#select-phrase').hide();
-        $('#diagram-results').show();
-
-        merged_data = merge_data( full_data );
-
-        //_diagram.draw( merged_data, mode, image_width, image_height );
-        $('#paper').show();
-        _graph.draw_graph( full_data[0]['editions'], state.get_query( 0 ) );
-    }
-
-
-    function arm_buttons() {
-        $('.single').click( function () {
-            state.set_mode( 1 );
-
-            $('#input-phrase').show();
-            $('#phrase-field').val('');
-            $('#select-mode').hide();
-        });
-
-
-        $('#select-mode-button').click( function() {
-            var mode = $('#select-mode').find('input:checked').val();
-
-            state.set_mode( parseInt( mode, 10 ) );
-
-            $('#input-phrase').show();
-            $('#phrase-field').val('');
-            $('#select-mode').hide();
-        });
-
-        $('#input-phrase-button').click( function() {
-            $('#input-phrase').submit();
-        });
-
-        $('#input-phrase').submit( function() {
-            var phrase = $(this).find('#phrase-field').val();
-            var lang = $(this).find('#lang-field').val();
-            state.add_lang( lang );
-
-            _store.get_propositions( phrase, lang, show_propositions );
-
-            return false;
-        });
-
-        $('#select-phrase-button').click( function() {
-            $('#select-phrase').submit();
-        });
-
-        $('#select-phrase').submit( function() {
-            var query = $(this).find('input:checked').val();
-            var lang = state.get_lang( state.act_nr() );
-
-            state.add_query( query );
-
-            get_data( query, lang, try_draw_diagram );
-
-            if ( state.get_mode() > state.act_nr() ) {
-                $('#input-phrase').show();
-                $('#select-phrase').hide();
-            }
-
-
-            return false;
-        });
-    }
-
-
+//    function draw_diagram() {
+//        var full_data = state.get_data();
+//        var image_width = 600;
+//        var image_height = 400;
+//        var merged_data = [];
+//        var mode = state.get_mode();
+//
+//        // if not all data is downloaded
+//        if ( full_data.length < mode ) {
+//            return;
+//        }
+//
+//        $('#select-phrase').hide();
+//        $('#diagram-results').show();
+//
+//        merged_data = merge_data( full_data );
+//
+//        //_diagram.draw( merged_data, mode, image_width, image_height );
+//        $('#paper').show();
+//        _graph.draw_graph( full_data[0]['editions'], state.get_query( 0 ) );
+//    }
+//
+//
+//    function arm_buttons() {
+//        $('.single').click( function () {
+//            state.set_mode( 1 );
+//
+//            $('#input-phrase').show();
+//            $('#phrase-field').val('');
+//            $('#select-mode').hide();
+//        });
+//
+//
+//        $('#select-mode-button').click( function() {
+//            var mode = $('#select-mode').find('input:checked').val();
+//
+//            state.set_mode( parseInt( mode, 10 ) );
+//
+//            $('#input-phrase').show();
+//            $('#phrase-field').val('');
+//            $('#select-mode').hide();
+//        });
+//
+//        $('#input-phrase-button').click( function() {
+//            $('#input-phrase').submit();
+//        });
+//
+//        $('#input-phrase').submit( function() {
+//            var phrase = $(this).find('#phrase-field').val();
+//            var lang = $(this).find('#lang-field').val();
+//            state.add_lang( lang );
+//
+//            _store.get_propositions( phrase, lang, show_propositions );
+//
+//            return false;
+//        });
+//
+//        $('#select-phrase-button').click( function() {
+//            $('#select-phrase').submit();
+//        });
+//
+//        $('#select-phrase').submit( function() {
+//            var query = $(this).find('input:checked').val();
+//            var lang = state.get_lang( state.act_nr() );
+//
+//            state.add_query( query );
+//
+//            get_data( query, lang, try_draw_diagram );
+//
+//            if ( state.get_mode() > state.act_nr() ) {
+//                $('#input-phrase').show();
+//                $('#select-phrase').hide();
+//            }
+//
+//
+//            return false;
+//        });
+//    }
+//
+//
 
     function get_data( query, lang, callback ) {
         function response( received_data ) {

@@ -29,15 +29,20 @@ template_dict = {
     'fresh_data': 'Aktualne dane',
     'save': 'Zapisz'
 }
+
 # routing
 
 @route('/')
 def index():
     return template( 'index', template_dict )
 
-@route('/single')
+@route('/single_query')
 def single_query():
     return template( 'single_query', template_dict )
+
+@route('/double_query')
+def double_query():
+    return template( 'double_query', template_dict )
 
 @route('/propositions')
 def propositions( db ):
@@ -49,21 +54,22 @@ def propositions( db ):
     # TODO do we need this object?
     return { 'propositions': propositions }
 
-@route('/data/<lang>/<query>')
+@route('/single_graph/<lang>/<query>')
 def data( db, lang, query ):
+    print query
     query = urllib.unquote( query ).decode('utf-8')
-    data = wdb.get_data( db, query, lang )
+    print query
+    data  = wdb.get_data( db, query, lang )
 
-    return template( 'single_graph', { 'query': query, 'data': data })
+    template_dict = {
+        'query' : query,
+        'data'  : data,
+        'lang'  : 'pl',
+        'title' : query
+    }
 
-#@route('/data')
-#def data( db ):
-#    query = request.query.query
-#    lang  = request.query.lang
-#
-#    data = wdb.get_data( db, query, lang )
-#
-#    return { 'data': data }
+    return template( 'single_graph', template_dict )
+
 
 @route('/year')
 def year_data( db ):
@@ -107,6 +113,8 @@ def server_static(filename):
 @route('/purge/')
 def purge_db():
     wdb.init_db( db_path, drop=True )
+
+    return "Done sucessfuly"
 
 
 # create dbs if not exist

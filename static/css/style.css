@@ -26,6 +26,15 @@ h1, p, img {
   margin: 5px 0px;
 }
 
+article {
+  width: 100%;
+  margin: 0px auto;
+}
+
+canvas {
+  margin: 0px auto;
+}
+
 a {
   text-decoration: none;
   color: #e1e1e1;

@@ -26,7 +26,7 @@ _graph = (function () {
             var bar_width  = width / bar_num;
             var year_width = bar_width * 12;
             var max_count  = data.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
-            var reference  = max_count > 50 ? max_count : 50;
+            var reference  = max_count > 150 ? max_count : 150;
 
             var years = today.getFullYear() - 2000;
 
