@@ -9,11 +9,11 @@ _app = (function (){
         });
 
         $('#query-form').submit( function () {
-            show_preloader('query');
-
             var query = $('#query-field').val();
             var lang  = $('#lang-field').val();
             state.add_lang( lang );
+
+            $('#results').fadeOut( 25 );
 
             _store.get_propositions( query, lang, show_propositions );
 
@@ -21,13 +21,49 @@ _app = (function (){
         });
     };
 
-    function show_preloader( key ) {
-        var mgs = {
-            'query': 'Wczytuję dane z Wikipedii. To może chwilę potrwać'
-        };
+    function show_propositions( data ) {
+        var propositions = data['propositions'];
+        var results_prop = $('#results-propositions');
+        var lang  = state.get_lang( state.act_nr() );
 
-        console.log( mgs[key] );
+        // remove previously displayed results
+        results_prop.empty();
+
+        // add new results
+        results_prop.append( propositions.map( function ( e ) {
+            return '<li>' +
+                     '<a href="/data/'+ lang +'/'+ e +'">' +
+                       '<p class="button">' + e +'</p>' +
+                     '</a>' +
+                   '</li>';
+        }).join( '' ) );
+
+        // show results
+        $('#results').fadeIn( 250 );
     }
+
+    function draw_diagram() {
+        var full_data = state.get_data();
+        var image_width = 600;
+        var image_height = 400;
+        var merged_data = [];
+        var mode = state.get_mode();
+
+        // if not all data is downloaded
+        if ( full_data.length < mode ) {
+            return;
+        }
+
+        $('#select-phrase').hide();
+        $('#diagram-results').show();
+
+        merged_data = merge_data( full_data );
+
+        //_diagram.draw( merged_data, mode, image_width, image_height );
+        $('#paper').show();
+        _graph.draw_graph( full_data[0]['editions'], state.get_query( 0 ) );
+    }
+
 
     function arm_buttons() {
         $('.single').click( function () {
@@ -85,28 +121,7 @@ _app = (function (){
         });
     }
 
-    function show_propositions( data ) {
-        var propositions = data['propositions'];
-        // TODO: cached button changes after choosing cached propositions
-        var is_cached = data['cached'];
 
-        $('#results-propositions').empty();
-
-        propositions.forEach( function ( phrase, i ) {
-            var proposition = proposition_to_html( phrase, i + 1 );
-            $('#results-propositions').append( proposition );
-        });
-
-        $('#results').fadeIn( 250 );
-    }
-
-    function proposition_to_html( name, nr ) {
-        if ( nr === 1 ) {
-            return '<input type="radio" name="propositions" value="' + name + '" checked>' + name + '<br>';
-        } else {
-            return '<input type="radio" name="propositions" value="' + name + '">' + name + '<br>';
-        }
-    }
 
     function get_data( query, lang, callback ) {
         function response( received_data ) {
@@ -123,27 +138,6 @@ _app = (function (){
         }
     }
 
-    function try_draw_diagram() {
-        var full_data = state.get_data();
-        var image_width = 600;
-        var image_height = 400;
-        var merged_data = [];
-        var mode = state.get_mode();
-
-        // if not all data is downloaded
-        if ( full_data.length < mode ) {
-            return;
-        }
-
-        $('#select-phrase').hide();
-        $('#diagram-results').show();
-
-        merged_data = merge_data( full_data );
-
-        //_diagram.draw( merged_data, mode, image_width, image_height );
-        $('#paper').show();
-        _graph.draw_graph( full_data[0]['editions'], state.get_query( 0 ) );
-    }
 
     function merge_data( full_data ) {
         function cmp_dates( date1, date2 ) {

@@ -2,4 +2,4 @@
 *.swp
 *.db
 *.*~
-*test.db
+tmp/test.db

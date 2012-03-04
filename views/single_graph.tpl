@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
-<html lang="{{lang}}">
+<html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>{{title}}</title>
+  <title></title>
   <link href='http://fonts.googleapis.com/css?family=Exo:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
 </head>
@@ -27,7 +27,7 @@
 
   <script type="text/javascript" language="javascript">
   // <![CDATA[
-    _graph.draw_graph( {{data}}, {{query}} );
+    _graph.draw_graph( {{!data}}, "{{!query}}" );
   // ]]>
   </script>
 </body>

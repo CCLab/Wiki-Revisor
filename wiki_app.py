@@ -3,6 +3,8 @@
 from bottle import install, route, run, template, request
 import wiki_db as wdb
 
+import simplejson as js
+import urllib
 import os
 file_path = os.path.dirname( __file__ )
 db_path = os.path.join( file_path, 'tmp', 'test.db' )
@@ -40,25 +42,28 @@ def single_query():
 @route('/propositions')
 def propositions( db ):
     query = request.query.query
-    lang = request.query.lang
+    lang  = request.query.lang
 
-    #lower_query = query.lower()
     propositions = wdb.get_query_hits( db, query, lang )
 
-    return {
-        'propositions': propositions,
-        'cached'      : False
-    }
+    # TODO do we need this object?
+    return { 'propositions': propositions }
 
-@route('/data')
-def data( db ):
-    query = request.query.query
-    lang = request.query.lang
-
-    #lower_query = query.lower()
+@route('/data/<lang>/<query>')
+def data( db, lang, query ):
+    query = urllib.unquote( query ).decode('utf-8')
     data = wdb.get_data( db, query, lang )
 
-    return { 'data': data }
+    return template( 'single_graph', { 'query': query, 'data': data })
+
+#@route('/data')
+#def data( db ):
+#    query = request.query.query
+#    lang  = request.query.lang
+#
+#    data = wdb.get_data( db, query, lang )
+#
+#    return { 'data': data }
 
 @route('/year')
 def year_data( db ):

@@ -7,7 +7,7 @@ def init_db( path, drop=False ):
     import sqlite3
     conn = sqlite3.connect( path )
     cursor = conn.cursor()
-    
+
     if drop:
         print 'Droping tables!'
         cursor.execute('''drop table id_map''')
@@ -15,30 +15,35 @@ def init_db( path, drop=False ):
         cursor.execute('''drop table search_data''')
         cursor.execute('''drop table editions''')
         cursor.execute('''drop table last_revisions''')
-    
-    create_id_map_query = '''create table if not exists id_map
-                          (query text, lang text, query_id integer)
+
+    create_id_map_query = '''
+        create table if not exists id_map
+            (query text, lang text, query_id integer)
     '''
-    create_search_map_query = ''' create table if not exists search_map
-                                  (query text, lang text, query_id integer)
+    create_search_map_query = '''
+        create table if not exists search_map
+            (query text, lang text, query_id integer)
     '''
-    create_search_data_query = '''create table if not exists search_data
-                                  (query_id integer, title text)
+    create_search_data_query = '''
+        create table if not exists search_data
+            (query_id integer, title text)
     '''
-    create_editions_query = '''create table if not exists editions
-                               (query_id integer, year integer, month integer, 
-                                day integer, time text, author text)
+    create_editions_query = '''
+        create table if not exists editions
+            (query_id integer, year integer, month integer,
+             day integer, time text, author text)
     '''
-    create_last_revisions_query = '''create table if not exists last_revisions
-                                    (query_id integer, last_revision integer)
+    create_last_revisions_query = '''
+        create table if not exists last_revisions
+            (query_id integer, last_revision integer)
     '''
-    
+
     cursor.execute( create_id_map_query )
     cursor.execute( create_search_map_query )
     cursor.execute( create_search_data_query )
     cursor.execute( create_editions_query )
     cursor.execute( create_last_revisions_query )
-    
+
 
 def is_search_data_cached( db, query, lang ):
     return is_query_cached( db, query, lang, table='search_map' )
@@ -46,7 +51,7 @@ def is_search_data_cached( db, query, lang ):
 def is_query_cached( db, query, lang, table='id_map' ):
     id = get_query_id( db, query, lang, table )
     return id is not None
-    
+
 def get_query_hits( db, query, lang ):
     if not is_search_data_cached( db, query, lang ):
         wup.update_search_data( db, query, lang )
@@ -66,18 +71,19 @@ def get_data( db, query, lang, year=None, month=None ):
 
 def get_cached_data( db, query, lang, year=None, month=None ):
     query_id = get_query_id( db, query, lang )
-    
-    return {
-        'editions': get_editions( db, query_id, year, month )
-    }
-    
+
+    # TODO do we really need that extra object?
+    #return { 'editions': get_editions( db, query_id, year, month ) }
+    return get_editions( db, query_id, year, month )
+
 def get_query_id( db, query, lang, table='id_map' ):
-    db_query = '''select query_id from ''' + table + ''' 
+    db_query = '''select query_id from ''' + table + '''
                   where query=? and lang=?'''
-    query_id = db.execute( db_query, (query, lang) ).fetchone()
-    
-    return query_id if query_id is None else query_id[0]
-    
+    query_id = db.execute( db_query, (query.lower(), lang) ).fetchone()
+
+    #return query_id if query_id is None else query_id[0]
+    return query_id[0] if query_id else None
+
 def get_editions( db, query_id, year=None, month=None ):
     editions = []
     '''
@@ -103,7 +109,7 @@ def get_month_editions( db, query_id, year, month ):
 def get_year_editions( db, query_id, year ):
     db_query = '''select month, count(*) from editions
                   where query_id=? and year=?
-                  group by month 
+                  group by month
                   order by month'''
     results = db.execute( db_query, (query_id, year) ).fetchall()
     return map( lambda t: { 'month': t[0], 'count': t[1] }, results )
@@ -115,7 +121,7 @@ def get_all_time_editions( db, query_id ):
                   order by year'''
     results = db.execute( db_query, (query_id,) ).fetchall()
     return map( lambda t: { 'year': t[0], 'count': t[1] }, results )
- 
+
 def get_year_month_editions( db, query_id ):
     db_query = '''select year, month, count(*) from editions
                   where query_id=?
@@ -123,4 +129,4 @@ def get_year_month_editions( db, query_id ):
                   order by year, month'''
     results = db.execute( db_query, (query_id,) ).fetchall()
     return map( lambda t: { 'year': t[0], 'month': t[1],'count': t[2] }, results )
-        
+

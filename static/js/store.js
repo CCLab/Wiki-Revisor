@@ -1,6 +1,13 @@
 _store = (function (){
     var that = {};
 
+    function show_preloader( key ) {
+        var mgs = {
+            'query': 'Szukam w Wikipedii podobnych haseł. Wikipedia jest duża, więc to może chwilę potrwać!'
+        };
+
+        console.log( mgs[key] );
+    }
     that.get_propositions = function( query, lang, callback ) {
         $.ajax({
             url     : '/propositions',

@@ -18,6 +18,10 @@ input, select {
   padding: 5px;
 }
 
+td {
+  padding: 0px 5px;
+}
+
 h1, p, img {
   margin: 5px 0px;
 }
@@ -38,7 +42,7 @@ ul {
 
 li {
   overflow: auto;
-  margin: 10px 0px;
+  margin: 0px;
 }
 
 .sep-l {

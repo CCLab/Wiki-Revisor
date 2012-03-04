@@ -13,8 +13,8 @@ def update_search_data( db, query, lang ):
         prev_results[ t[0] ] = True
     start_time = time.time()
     propositions = wapi.search_propositions( query, lang )
-    print 'Search query =', query
-    print 'Search elapsed:', time.time() - start_time
+    print 'Search query = ', query
+    print 'Search elapsed: ', time.time() - start_time
     new_results = {}
     for t in propositions:
         new_results[ t ] = True
@@ -44,9 +44,9 @@ def update_data( db, query, lang ):
     update_last_revision( db, query_id, data['last_id'] )
 
 def get_query_id( db, query, lang, table='id_map' ):
-    db_query = '''select query_id from ''' + table + ''' 
+    db_query = '''select query_id from ''' + table + '''
                   where query=? and lang=?'''
-    query_id = db.execute( db_query, (query, lang) ).fetchone()
+    query_id = db.execute( db_query, (query.lower(), lang) ).fetchone()
 
     return query_id if query_id is None else query_id[0]
 
@@ -54,9 +54,9 @@ def get_or_create_query_id( db, query, lang, table='id_map' ):
     query_id = get_query_id( db, query, lang, table )
     if query_id is None:
         new_query_id = get_max_query_id( db, table ) + 1
-        db_query = '''insert into ''' + table + ''' 
+        db_query = '''insert into ''' + table + '''
                       values (?,?,?)'''
-        db.execute( db_query, (query, lang, new_query_id) )
+        db.execute( db_query, (query.lower(), lang, new_query_id) )
         return new_query_id
     else:
         return query_id
