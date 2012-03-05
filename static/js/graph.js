@@ -162,7 +162,7 @@ _graph = (function () {
 
             p5.fill( 190 );
             p5.textAlign( p5.LEFT );
-            p5.text( query + " :: " + total, 5, -7 );
+            p5.text( query, 5, -7 );
             p5.fill( 130 );
             p5.textAlign( p5.RIGHT );
             p5.text( "Liczba edycji: " + total, width-5, -7 );
