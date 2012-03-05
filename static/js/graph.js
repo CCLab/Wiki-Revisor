@@ -34,7 +34,9 @@ _graph = (function () {
             var bar_width  = width / bar_num;
             var year_width = bar_width * 12;
             var max_count1 = data1.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
+            var total1     = data1.map( function ( e ) { return e['count'] } ).reduce( function ( a, b ) { return a + b } );
             var max_count2 = data2.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
+            var total2     = data2.map( function ( e ) { return e['count'] } ).reduce( function ( a, b ) { return a + b } );
             var max_count  = Math.max( max_count1, max_count2 );
             var reference  = max_count > 150 ? max_count : 150;
 
@@ -59,6 +61,10 @@ _graph = (function () {
             p5.textAlign( p5.LEFT );
             p5.text( query1, 5, -7 );
             p5.text( query2, 5, height+20 );
+            p5.fill( 130 );
+            p5.textAlign( p5.RIGHT );
+            p5.text( "Liczba edycji: " + total1, width-5, -7 );
+            p5.text( "Liczba edycji: " + total2, width-5, height+20 );
 
             p5.fill( 160 );
             p5.textFont( p5.createFont( 'sans-serif' ), 10 );
@@ -133,6 +139,7 @@ _graph = (function () {
             var bar_width  = width / bar_num;
             var year_width = bar_width * 12;
             var max_count  = data.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
+            var total      = data.map( function ( e ) { return e['count'] } ).reduce( function ( a, b ) { return a + b } );
             var reference  = max_count > 150 ? max_count : 150;
 
             var years = today.getFullYear() - 2000;
@@ -154,7 +161,10 @@ _graph = (function () {
 
             p5.fill( 190 );
             p5.textAlign( p5.LEFT );
-            p5.text( query, 5, -7 );
+            p5.text( query + " :: " + total, 5, -7 );
+            p5.fill( 130 );
+            p5.textAlign( p5.RIGHT );
+            p5.text( "Liczba edycji: " + total, width-5, -7 );
 
             p5.fill( 160 );
             p5.textFont( p5.createFont( 'sans-serif' ), 10 );
