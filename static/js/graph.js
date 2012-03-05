@@ -68,6 +68,7 @@ _graph = (function () {
 
             p5.fill( 160 );
             p5.textFont( p5.createFont( 'sans-serif' ), 10 );
+            p5.textAlign( p5.LEFT );
 
             p5.pushMatrix();
             p5.translate( 0, -height * 0.47 );
@@ -168,6 +169,7 @@ _graph = (function () {
 
             p5.fill( 160 );
             p5.textFont( p5.createFont( 'sans-serif' ), 10 );
+            p5.textAlign( p5.LEFT );
 
             data.forEach( function ( e ) {
                 var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
