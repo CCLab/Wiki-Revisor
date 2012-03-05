@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="{{lang}}">
+<html lang="{{html_lang}}">
   <head>
     <meta charset="UTF-8">
     <title>{{title}}</title>
@@ -129,7 +129,7 @@
 
     <script type="text/javascript" language="javascript">
     // <![CDATA[
-    _app.init();
+    _app.init( '{{target_url}}' );
     // ]]>
     </script>
   </body>

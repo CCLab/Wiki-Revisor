@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="{{lang}}">
+<html lang="{{html_lang}}">
 <head>
   <meta charset="UTF-8">
   <title>{{title}}</title>
@@ -22,7 +22,11 @@
   <script src="/static/js/graph.js"></script>
   <script type="text/javascript" language="javascript">
   // <![CDATA[
-    _graph.draw_graph( {{!data}}, "{{!query}}" );
+    %if data2:
+      _graph.draw_graph( {{!data1}}, "{{!query1}}", {{!data2}}, "{{!query2}}" );
+    %else:
+      _graph.draw_graph( {{!data1}}, "{{!query1}}" );
+    %end
   // ]]>
   </script>
 </body>

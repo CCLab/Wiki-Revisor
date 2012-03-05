@@ -23,10 +23,10 @@
   </section>
 
   <section style="width: 48%;" class="right">
-    <h1><a href="/double_query">Zestawienie haseł</a></h1>
-    <a href="/double_query"><img src="/static/img/both.png" alt="Historia edycji hasła Copyright na anglojęzycznej Wikipedii" class="left" /></a>
+    <h1><a href="/first_query">Zestawienie haseł</a></h1>
+    <a href="/first_query"><img src="/static/img/both.png" alt="Historia edycji hasła Copyright na anglojęzycznej Wikipedii" class="left" /></a>
     <p class="right">Ten modół pozwoli zobaczyć szczegółowe statystyki pojedynczego hasła z Wikipedii.</p>
-    <div class="right button"><a href="/double_query">Stwórz zestawienie</a></div>
+    <div class="right button"><a href="/first_query">Stwórz zestawienie</a></div>
   </section>
 
   <br />
