@@ -85,38 +85,32 @@ def propositions( db ):
     # TODO do we need this object?
     return { 'propositions': propositions }
 
-@route('/graph/<lang>/<query>')
-def data( db, lang, query ):
-    query = urllib.unquote( query ).decode('utf-8')
-    data  = wdb.get_data( db, query, lang )
+
+@route('/graph/<path:path>')
+def data( db, path ):
+    params = path.split('/')
+
+    data  = []
+    title = ''
+    for i in range( len( params ) / 2 ):
+        lang  = params[i*2]
+        query = urllib.unquote( params[i*2+1] ).decode('utf-8')
+
+        title += "%s :: " % query
+        data.append({
+            'lang'  : lang,
+            'query' : query,
+            'data'  : wdb.get_data( db, query, lang )
+        })
 
     template_dict = {
-        'query1'    : query,
-        'data1'     : data,
-        'data2'     : None,
         'html_lang' : 'pl',
-        'title'     : query
+        'title'     : title[:-4],
+        'data'      : js.dumps( data )
     }
 
-    return template( 'single_graph', template_dict )
+    return template( 'graph', template_dict )
 
-@route('/graph/<lang1>/<query1>/<lang2>/<query2>')
-def data( db, lang1, query1, lang2, query2 ):
-    query1 = urllib.unquote( query1 ).decode('utf-8')
-    query2 = urllib.unquote( query2 ).decode('utf-8')
-    data1  = wdb.get_data( db, query1, lang1 )
-    data2  = wdb.get_data( db, query2, lang2 )
-
-    template_dict = {
-        'query1'    : query1,
-        'data1'     : data1,
-        'query2'    : query2,
-        'data2'     : data2,
-        'html_lang' : 'pl',
-        'title'     : '%s :: %s' % ( query1, query2 )
-    }
-
-    return template( 'single_graph', template_dict )
 
 @route('/year')
 def year_data( db ):

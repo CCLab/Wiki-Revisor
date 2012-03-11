@@ -1,201 +1,248 @@
 _graph = (function () {
     var that = {};
 
-    that.draw_graph = function ( data1, query1, data2, query2 ) {
+    // args => [ { data: [], query: str, lang: str }, ... ]
+    that.draw_graph = function ( args ) {
 
         function sketch( p5 ) {
-
-          p5.setup = function () {
-              p5.size( 800, !!data2 ? 700 : 500 );
-              p5.noStroke();
-              p5.fill( 255, 100 );
-              p5.noLoop();
-          };
-
-          p5.draw = function() {
-              if( !data2 ) {
-                  single_graph( data1, query1 );
-              }
-              else {
-                  double_graph( data1, query1, data2, query2 );
-              }
-          };
-
-          function double_graph ( data1, query1, data2, query2 ) {
             var i;
-            var width  = p5.width - 60;
-            var height = p5.height - 60;
+            var width, height;
             var margin_x = 30;
             var margin_y = 30;
 
-            // January, 2001 is the starting point of Wikipedia
-            var today      = new Date();
-            var bar_num    = ( today.getFullYear() - 2000 ) * 12;
-            var bar_width  = width / bar_num;
-            var year_width = bar_width * 12;
-            var max_count1 = data1.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
-            var total1     = data1.map( function ( e ) { return e['count'] } ).reduce( function ( a, b ) { return a + b } );
-            var max_count2 = data2.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
-            var total2     = data2.map( function ( e ) { return e['count'] } ).reduce( function ( a, b ) { return a + b } );
-            var max_count  = Math.max( max_count1, max_count2 );
-            var reference  = max_count > 150 ? max_count : 150;
+            var today;
+            var bar_num;
+            var bar_width;
+            var year_width;
+            var years;
 
-            var years = today.getFullYear() - 2000;
+            var total_max_count;
+            var max_counts
+            var totals;
+            var reference;
 
-            p5.background( 80 );
-            p5.translate( margin_x, margin_y );
+            var single;
+            var doubles;
 
-            p5.textFont( p5.createFont( 'sans-serif' ), 18 );
-            p5.textAlign( p5.CENTER );
+            p5.setup = function () {
+                p5.size( 800, 300 + ( args.length * 200 ) );
+                width  = p5.width - 60;
+                height = p5.height - 60;
 
-            // background annual stripes
-            for( i = 0; i < years; ++i ) {
-                p5.fill( i % 2 == 0 ? 95 : 100 );
-                p5.rect( i * year_width, 0, year_width, height );
+                // January, 2001 is the starting point of Wikipedia
+                today      = new Date();
+                years_num  = today.getFullYear() - 2000;
+                bar_num    = years_num * 12;
+                bar_width  = width / bar_num;
+                year_width = bar_width * 12;
 
-                p5.fill( 130 );
-                p5.text( 2001 + i, i * year_width + year_width / 2, 30 );
+                max_counts = args.map( function ( e ) {
+                        return e['data'].sort( function ( a, b ) {
+                            return b['count'] - a['count'];
+                            })[0]['count'];
+                        });
+
+                totals = args.map( function ( e ) {
+                        return e['data'].map( function ( d ) {
+                            return d['count'];
+                            }).reduce( function ( a, b ) {
+                                return a + b;
+                                });
+                        });
+
+                total_max_count = max_counts.reduce( function ( a, b ) {
+                        return Math.max( a, b );
+                        });
+
+                reference = total_max_count > 150 ? total_max_count : 150;
+
+                single  = !!(args.length % 2);
+                doubles = Math.floor( args.length / 2 );
+
+                p5.noStroke();
+                p5.fill( 255, 100 );
+                p5.frameRate( 25 );
+            };
+
+            p5.draw = function() {
+                var _args = [].concat( args );
+                var _max_counts = [].concat( max_counts );
+                var _totals = [].concat( totals );
+
+                p5.background( 80 );
+                p5.noStroke();
+                p5.translate( margin_x, margin_y );
+
+                p5.textFont( p5.createFont( 'sans-serif' ), 18 );
+                p5.textAlign( p5.CENTER );
+
+                // background annual stripes
+                for( i = 0; i < years_num; ++i ) {
+                    p5.fill( i % 2 == 0 ? 95 : 100 );
+                    p5.rect( i * year_width, 0, year_width, height );
+
+                    p5.fill( 130 );
+                    p5.text( 2001 + i, i * year_width + year_width / 2, 30 );
+                }
+
+                // draw all paired queries
+                for( i = 0; i < doubles; ++i ) {
+                    // TODO make it list of hashes and simplify the drawing code
+                    var pair_data = {
+                            data: [ _args.shift(), _args.shift() ],
+                            max_count: [ _max_counts.shift(), _max_counts.shift() ],
+                            total: [ _totals.shift(), _totals.shift() ],
+                            reference: reference
+                    };
+
+                    double_graph( pair_data, i * 500 );
+                }
+                // and finally the last one (if there is one)
+                console.log( _args );
+                if( single ) {
+                    var single_data = {
+                            data: _args.shift(),
+                            max_count: _max_counts.shift(),
+                            total: _totals.shift(),
+                            reference: reference
+                    };
+                    console.log( p5.frameCount );
+                    single_graph( single_data, doubles * 500 );
+                }
+            };
+
+            function single_graph( single_data, position ) {
+                var data = single_data['data'];
+
+                p5.fill( 190 );
+                p5.textFont( p5.createFont( 'sans-serif' ), 15 );
+
+                p5.textAlign( p5.LEFT );
+                p5.text( data['query'] + " (" + data['lang'] + ")", 5, -7 );
+
+                p5.textAlign( p5.RIGHT );
+                p5.text( "Liczba edycji: " + single_data['total'], width-5, -7 );
+
+                p5.fill( 160 );
+                p5.textFont( p5.createFont( 'sans-serif' ), 11 );
+                p5.textAlign( p5.LEFT );
+
+                data['data'].forEach( function ( e ) {
+                    var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
+                    var w = bar_width * 0.75;
+                    var h = height * 0.88 * ( e['count'] / single_data['reference'] );
+                    var tmp_h = ( h / 20 ) * p5.frameCount;
+                    if( p5.frameCount < 20 ) {
+                        h = tmp_h;
+                    }
+                    else {
+                        p5.noLoop();
+                    }
+
+                    if( single_data['max_count'] == e['count'] ) {
+                        p5.pushStyle();
+
+                        p5.fill( 255 );
+                        p5.stroke( 150 );
+                        p5.line( x, height - h, x + w + 30, height - h );
+                        p5.text( single_data['max_count'], x + w + 3, height - h - 3 );
+
+                        p5.noStroke();
+                        p5.rect( x, height, w, -h );
+
+                        p5.popStyle();
+                    }
+                    else {
+                        p5.rect( x, height, w, -h );
+                    }
+                });
+
             }
 
-            p5.fill( 190 );
-            p5.textAlign( p5.LEFT );
-            p5.text( query1, 5, -7 );
-            p5.text( query2, 5, height+20 );
-            p5.fill( 130 );
-            p5.textAlign( p5.RIGHT );
-            p5.text( "Liczba edycji: " + total1, width-5, -7 );
-            p5.text( "Liczba edycji: " + total2, width-5, height+20 );
+            function double_graph ( pair_data, position ) {
+                var data = pair_data['data'];
 
-            p5.fill( 160 );
-            p5.textFont( p5.createFont( 'sans-serif' ), 10 );
-            p5.textAlign( p5.LEFT );
+                p5.fill( 190 );
+                p5.textFont( p5.createFont( 'sans-serif' ), 15 );
 
-            p5.pushMatrix();
-            p5.translate( 0, -height * 0.47 );
-            data1.forEach( function ( e ) {
-                var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
-                var w = bar_width * 0.75;
-                var h = height / 2 * 0.88 * ( e['count'] / reference );
+                p5.textAlign( p5.LEFT );
+                p5.text( data[0]['query'] + " (" + data[0]['lang'] + ")", 5, -7 );
+                p5.text( data[1]['query'] + " (" + data[1]['lang'] + ")", 5, height+20 );
 
+                p5.textAlign( p5.RIGHT );
+                p5.text( "Liczba edycji: " + pair_data['total'][0], width-5, -7 );
+                p5.text( "Liczba edycji: " + pair_data['total'][1], width-5, height+20 );
 
-                if( max_count1 == e['count'] ) {
-                    p5.pushStyle();
+                p5.fill( 160 );
+                p5.textFont( p5.createFont( 'sans-serif' ), 11 );
+                p5.textAlign( p5.LEFT );
 
-                    p5.fill( 255 );
-                    p5.stroke( 150 );
-                    p5.line( x, height - h, x + w + 30, height - h );
-                    p5.text( max_count1, x + w + 3, height - h - 3 );
+                p5.pushMatrix();
+                p5.translate( 0, -height * 0.47 );
+                data[0]['data'].forEach( function ( e ) {
+                    var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
+                    var w = bar_width * 0.75;
+                    var h = height / 2 * 0.88 * ( e['count'] / pair_data['reference'] );
+                    var tmp_h = ( h / 20 ) * p5.frameCount;
+                    if( p5.frameCount < 20 ) {
+                        h = tmp_h;
+                    }
 
-                    p5.noStroke();
-                    p5.rect( x, height, w, -h );
+                    if( pair_data['max_count'][0] == e['count'] ) {
+                        p5.pushStyle();
 
-                    p5.popStyle();
-                }
-                else {
-                    p5.rect( x, height, w, -h );
-                }
-            });
+                        p5.fill( 255 );
+                        p5.stroke( 150 );
+                        p5.line( x, height - h, x + w + 30, height - h );
+                        p5.text( pair_data['max_count'][0], x + w + 3, height - h - 3 );
 
-            data2.forEach( function ( e ) {
-                var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
-                var w = bar_width * 0.75;
-                var h = height / 2 * 0.88 * ( e['count'] / reference );
+                        p5.noStroke();
+                        p5.rect( x, height, w, -h );
 
+                        p5.popStyle();
+                    }
+                    else {
+                        p5.rect( x, height, w, -h );
+                    }
+                });
 
-                if( max_count2 == e['count'] ) {
-                    p5.pushStyle();
+                data[1]['data'].forEach( function ( e ) {
+                    var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
+                    var w = bar_width * 0.75;
+                    var h = height / 2 * 0.88 * ( e['count'] / pair_data['reference'] );
+                    var tmp_h = ( h / 20 ) * p5.frameCount;
+                    if( p5.frameCount < 20 ) {
+                        h = tmp_h;
+                    }
+                    else {
+                        p5.noLoop();
+                    }
 
-                    p5.fill( 255 );
-                    p5.stroke( 150 );
-                    p5.line( x, height + h, x + w + 30, height + h );
-                    p5.text( max_count2, x + w + 3, height + h + 11 );
+                    if( pair_data['max_count'][1] == e['count'] ) {
+                        p5.pushStyle();
 
-                    p5.noStroke();
-                    p5.rect( x, height, w, h );
+                        p5.fill( 255 );
+                        p5.stroke( 150 );
+                        p5.line( x, height + h, x + w + 30, height + h );
+                        p5.text( pair_data['max_count'][1], x + w + 3, height + h + 11 );
 
-                    p5.popStyle();
-                }
-                else {
-                    p5.rect( x, height, w, h );
-                }
-            });
+                        p5.noStroke();
+                        p5.rect( x, height, w, h );
 
-            p5.strokeWeight( 2 );
-            p5.stroke( 80 );
-            p5.line( 0, height, width, height );
+                        p5.popStyle();
+                    }
+                    else {
+                        p5.rect( x, height, w, h );
+                    }
+                });
 
-            p5.popMatrix();
-          }
+                p5.strokeWeight( 2 );
+                p5.stroke( 80 );
+                p5.line( 0, height, width, height );
 
-          function single_graph ( data, query ) {
-            var i;
-            var width  = p5.width - 60;
-            var height = p5.height - 60;
-            var margin_x = 30;
-            var margin_y = 30;
-
-            // January, 2001 is the starting point of Wikipedia
-            var today      = new Date();
-            var bar_num    = ( today.getFullYear() - 2000 ) * 12;
-            var bar_width  = width / bar_num;
-            var year_width = bar_width * 12;
-            var max_count  = data.sort( function ( a, b ) { return b['count'] - a['count'] } )[0]['count'];
-            var total      = data.map( function ( e ) { return e['count'] } ).reduce( function ( a, b ) { return a + b } );
-            var reference  = max_count > 150 ? max_count : 150;
-
-            var years = today.getFullYear() - 2000;
-
-            p5.background( 80 );
-            console.log( margin_x );
-            p5.translate( margin_x, margin_y );
-
-            p5.textFont( p5.createFont( 'sans-serif' ), 18 );
-            p5.textAlign( p5.CENTER );
-
-            for( i = 0; i < years; ++i ) {
-                p5.fill( i % 2 == 0 ? 95 : 100 );
-                p5.rect( i * year_width, 0, year_width, height );
-
-                p5.fill( 130 );
-                p5.text( 2001 + i, i * year_width + year_width / 2, 30 );
+                p5.popMatrix();
             }
 
-            p5.fill( 190 );
-            p5.textAlign( p5.LEFT );
-            p5.text( query, 5, -7 );
-            p5.fill( 130 );
-            p5.textAlign( p5.RIGHT );
-            p5.text( "Liczba edycji: " + total, width-5, -7 );
-
-            p5.fill( 160 );
-            p5.textFont( p5.createFont( 'sans-serif' ), 10 );
-            p5.textAlign( p5.LEFT );
-
-            data.forEach( function ( e ) {
-                var x = (( e['year'] - 2001 ) * 12 + e['month'] - 1 ) * bar_width;
-                var w = bar_width * 0.75;
-                var h = height * 0.88 * ( e['count'] / reference );
-
-
-                if( max_count == e['count'] ) {
-                    p5.pushStyle();
-
-                    p5.fill( 255 );
-                    p5.stroke( 150 );
-                    p5.line( x, height - h, x + w + 30, height - h );
-                    p5.text( max_count, x + w + 3, height - h - 3 );
-
-                    p5.noStroke();
-                    p5.rect( x, height, w, -h );
-
-                    p5.popStyle();
-                }
-                else {
-                    p5.rect( x, height, w, -h );
-                }
-            });
-
-          }
         }
 
         var canvas     = document.getElementById( 'paper' );

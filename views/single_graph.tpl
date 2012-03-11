@@ -23,9 +23,10 @@
   <script type="text/javascript" language="javascript">
   // <![CDATA[
     %if data2:
-      _graph.draw_graph( {{!data1}}, "{{!query1}}", {{!data2}}, "{{!query2}}" );
+      _graph.draw_graph( [{ data: {{!data1}}, query: "{{!query1}}", lang: "{{!lang1}}" },
+                          { data: {{!data2}}, query: "{{!query2}}", lang: "{{!lang2}}" } ] );
     %else:
-      _graph.draw_graph( {{!data1}}, "{{!query1}}" );
+      _graph.draw_graph( [{ data: {{!data1}}, query: "{{!query1}}", lang: "{{!lang1}}" }] );
     %end
   // ]]>
   </script>
