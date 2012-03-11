@@ -25,6 +25,9 @@ td {
 h1, p, img {
   margin: 5px 0px;
 }
+h2 {
+  margin: 0px;
+}
 
 article {
   width: 100%;
@@ -67,6 +70,7 @@ li {
   padding: 6px 9px;
   border-radius: 3px;
   background-color: #6a6a6a;
+  user-select: none;
 }
 .button:hover {
   cursor: pointer;

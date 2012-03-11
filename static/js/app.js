@@ -12,11 +12,13 @@ _app = (function (){
             var query = $('#query-field').val();
             var lang  = $('#lang-field').val();
 
-            $('#results').fadeOut( 25 );
+            if( !!query ) {
+                $('#results').fadeOut( 25 );
 
-            _store.get_propositions( query, lang, function ( data ) {
-                    show_propositions( data, target_url );
-            });
+                _store.get_propositions( query, lang, function ( data ) {
+                        show_propositions( data, target_url );
+                });
+            }
 
             return false;
         });
@@ -30,6 +32,9 @@ _app = (function (){
         // remove previously displayed results
         results_prop.empty();
 
+        if( !propositions.length ) {
+            results_prop.append( '<h2>Brak wyników. Spróbuj jeszcze raz!</h2>' );
+        }
         // add new results
         results_prop.append( propositions.map( function ( e ) {
             return '<li>' +

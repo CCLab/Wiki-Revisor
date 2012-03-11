@@ -9,13 +9,16 @@
 <body>
 
   <header>
-  	<h1>Wiki rewizor</h1>
+      <h1 style="float: left;"><a href="/">Wiki rewizor</a></h1>
+      <a href="/">
+        <p style="float: right; margin-top: 12px;" class="button">Nowy wykres</p>
+      </a>
   </header>
   
   <br />
 
-  <article>
-    <canvas id="paper" width="900" height="600"></canvas>
+  <article style="width: 800px; margin: 0px auto;">
+    <canvas id="paper" width="800" height="600"></canvas>
   </article>
   
   <script src="/static/js/processing-1.3.6.min.js"></script>

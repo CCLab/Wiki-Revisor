@@ -9,8 +9,11 @@
   <body>
 
     <header>
-      <h1>Wiki rewizor</h1>
-      <p>Wybierz interesujące cię hasło oraz wersję językową Wikipedii</p>
+      <h1 style="float: left;"><a href="/">Wiki rewizor</a></h1>
+      <a href="/">
+        <p style="float: right; margin-top: 12px;" class="button">Zacznij od nowa</p>
+      </a>
+      <p style="clear: both;">Wybierz interesujące cię hasło oraz wersję językową Wikipedii</p>
     </header>
 
     <br />
@@ -113,7 +116,7 @@
           </tbody>
         </table>
         <br />
-        <div id="query-button" class="left button sep-l">{{query_button}}</div>
+        <div id="query-button" class="left button">{{query_button}}</div>
       </form>
     </section>
 
