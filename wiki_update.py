@@ -55,8 +55,8 @@ def get_or_create_query_id( db, query, lang, table='id_map' ):
     if query_id is None:
         new_query_id = get_max_query_id( db, table ) + 1
         db_query = '''insert into ''' + table + '''
-                      values (?,?,?)'''
-        db.execute( db_query, (query.lower(), lang, new_query_id) )
+                      values (?,?,?,?)'''
+        db.execute( db_query, (query.lower(), query, lang, new_query_id) )
         return new_query_id
     else:
         return query_id
@@ -101,7 +101,7 @@ def update_last_revision( db, query_id, last_revision ):
 def update_all_search_queries( db ):
     start_time = time.time()
 
-    db_query = '''select query, lang from search_map'''
+    db_query = '''select primary_query, lang from search_map'''
     results = db.execute( db_query, () ).fetchall()
     for t in results:
         query, lang = t
@@ -115,7 +115,7 @@ def update_all_search_queries( db ):
 def update_all_editions( db ):
     start_time = time.time()
 
-    db_query = '''select query, lang from id_map'''
+    db_query = '''select primary_query, lang from id_map'''
     results = db.execute( db_query, () ).fetchall()
     for t in results:
         query, lang = t

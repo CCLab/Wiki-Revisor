@@ -18,11 +18,11 @@ def init_db( path, drop=False ):
 
     create_id_map_query = '''
         create table if not exists id_map
-            (query text, lang text, query_id integer)
+            (query text, primary_query text, lang text, query_id integer)
     '''
     create_search_map_query = '''
         create table if not exists search_map
-            (query text, lang text, query_id integer)
+            (query text, primary_query text, lang text, query_id integer)
     '''
     create_search_data_query = '''
         create table if not exists search_data
