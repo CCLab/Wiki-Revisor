@@ -132,6 +132,15 @@ def month_data( db ):
 
     return { 'data': data }
 
+@route('/stats')
+def stats( db ):
+    template_dict = {
+        'html_lang' : 'pl',
+        'title'     : 'Statystyki',
+        'data'      : wdb.get_stats( db )
+    }
+
+    return template( 'stats', template_dict )
 
 # static files
 from bottle import static_file

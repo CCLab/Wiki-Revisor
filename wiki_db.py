@@ -131,3 +131,18 @@ def get_year_month_editions( db, query_id ):
     results = db.execute( db_query, (query_id,) ).fetchall()
     return map( lambda t: { 'year': t[0], 'month': t[1],'count': t[2] }, results )
 
+def get_stats( db ):
+    import locale
+    locale.setlocale( locale.LC_ALL, "" )
+
+    db_query = '''SELECT lang, primary_query FROM id_map
+                  ORDER BY lang, primary_query'''
+    results =  db.execute( db_query ).fetchall()
+
+    langs = {}
+    for item in results:
+        langs.setdefault( item[0], [] ).append( item[1] )
+
+    return [ { 'lang': k, 'queries': sorted( v, cmp=locale.strcoll ) } for k, v in langs.items() ]
+
+
