@@ -13,8 +13,6 @@ def update_search_data( db, query, lang ):
         prev_results[ t[0] ] = True
     start_time = time.time()
     propositions = wapi.search_propositions( query, lang )
-    print 'Search query = ', query
-    print 'Search elapsed: ', time.time() - start_time
     new_results = {}
     for t in propositions:
         new_results[ t ] = True
@@ -37,8 +35,6 @@ def update_data( db, query, lang ):
 
     start_time = time.time()
     data = wapi.grab_data( lang, query, startid=last_id )
-    print 'Editions query =', query
-    print 'Editions elapsed:', time.time() - start_time
 
     update_editions( db, query_id, data['results'] )
     update_last_revision( db, query_id, data['last_id'] )

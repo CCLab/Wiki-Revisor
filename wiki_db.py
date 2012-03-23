@@ -8,6 +8,7 @@ def init_db( path, drop=False ):
     conn = sqlite3.connect( path )
     cursor = conn.cursor()
 
+    print path
     if drop:
         print 'Droping tables!'
         cursor.execute('''drop table id_map''')
