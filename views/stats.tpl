@@ -22,7 +22,7 @@
     % for position in data:
         <h2>{{position['lang']}}</h2>
         % for query in position['queries']:
-            <p style="margin-left: 15px;"><a href="http://{{position['lang']}}.wikipedia.org/wiki/{{query}}" target="_blank">{{query}}</a></p>
+            <p style="margin-left: 15px;"><a href="/graph/{{position['lang']}}/{{query}}">{{query}}</a></p>
         </h2>
         % end
     % end

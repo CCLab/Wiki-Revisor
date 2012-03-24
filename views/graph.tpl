@@ -17,10 +17,13 @@
   
   <br />
 
-  <article style="width: 800px; margin: 0px auto;">
+  <article style="width: 800px; margin: 0px auto; clear: both;">
+    <p id="wiki-link-01" class="left"></p>
     <canvas id="paper" width="800" height="600"></canvas>
+    <p id="wiki-link-02" class="left"></p>
   </article>
   
+  <script src="/static/js/jquery-1.7.1.min.js"></script>
   <script src="/static/js/processing-1.3.6.min.js"></script>
   <script src="/static/js/graph.js"></script>
   <script type="text/javascript" language="javascript">

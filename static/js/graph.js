@@ -62,6 +62,9 @@ _graph = (function () {
                 p5.noStroke();
                 p5.fill( 255, 100 );
                 p5.frameRate( 25 );
+
+                $('#wiki-link-01').append( '<a href="http://' + args[0]['lang'] + '.wikipedia.org/wiki/' +  args[0]['query'] + '" target="_blank"><b>' +  args[0]['query'] + '</b> na Wikipedii</a>' );
+                $('#wiki-link-02').append( '<a href="http://' + args[1]['lang'] + '.wikipedia.org/wiki/' +  args[1]['query'] + '" target="_blank"><b>' +  args[1]['query'] + '</b> na Wikipedii</a>' );
             };
 
             p5.draw = function() {

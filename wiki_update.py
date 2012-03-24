@@ -144,7 +144,7 @@ if __name__ == "__main__":
         path = sys.argv[1]
     except:
         file_path = os.path.dirname( __file__ )
-        path = os.path.join( file_path, 'tmp', 'test.db' )
+        path = os.path.join( file_path, 'cache.db' )
 
     conn = sqlite3.connect( path )
     cursor = conn.cursor()
