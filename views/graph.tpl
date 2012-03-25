@@ -15,12 +15,10 @@
       </a>
   </header>
   
-  <br />
+  <br style="clear: both"/>
 
-  <article style="width: 800px; margin: 0px auto; clear: both;">
-    <p id="wiki-link-01" class="left"></p>
+  <article style="width: 800px; margin: 30px auto; clear: both;">
     <canvas id="paper" width="800" height="600"></canvas>
-    <p id="wiki-link-02" class="left"></p>
   </article>
   
   <script src="/static/js/jquery-1.7.1.min.js"></script>

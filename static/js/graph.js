@@ -63,8 +63,12 @@ _graph = (function () {
                 p5.fill( 255, 100 );
                 p5.frameRate( 25 );
 
-                $('#wiki-link-01').append( '<a href="http://' + args[0]['lang'] + '.wikipedia.org/wiki/' +  args[0]['query'] + '" target="_blank"><b>' +  args[0]['query'] + '</b> na Wikipedii</a>' );
-                $('#wiki-link-02').append( '<a href="http://' + args[1]['lang'] + '.wikipedia.org/wiki/' +  args[1]['query'] + '" target="_blank"><b>' +  args[1]['query'] + '</b> na Wikipedii</a>' );
+                var canvas = $('canvas');
+
+                canvas.before( '<p style="margin: 15px 0px"><a class="button" href="http://' + args[0]['lang'] + '.wikipedia.org/wiki/' +  args[0]['query'] + '" target="_blank">Zobacz artykuł <b>' +  args[0]['query'] + '</b> na Wikipedii</a></p>' );
+                if( !!args[1] ) {
+                    canvas.after( '<p style="margin: 15px 0px"><a class="button" href="http://' + args[1]['lang'] + '.wikipedia.org/wiki/' +  args[1]['query'] + '" target="_blank">Zobacz artykuł <b>' +  args[1]['query'] + '</b> na Wikipedii</a></p>' );
+                }
             };
 
             p5.draw = function() {

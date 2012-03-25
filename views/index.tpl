@@ -31,6 +31,13 @@
 
   <br style="clear: both" />
   
+  <section style="margin-top: 50px; overflow: auto; width: 48%;">
+    <h1><a href="/stats">Archiwum</a></h1>
+    <p class="right">Zobacz, historię edycji, których artykułów wizualizowali dotychczas inni użytkownicy serwisu.</p>
+    <a href="/stats"><div class="right button">Zoabcz archiwum</div></a>
+  </section>
+
+  <br style="clear: both" />
   <footer style="margin-top: 100px; font-size: 12px;">
   	<section style="width=48%" class="left">Jeśli nie zaznaczono inaczej, wszystkie treści objęte są licencją Creative Commons Uznanie Autorstwa 3.0 Unported <br />
   	Serwis przygotowany przez Centrum Cyfrowe Projekt: Polska</section>
